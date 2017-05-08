@@ -1,3 +1,5 @@
+[![Code Climate](https://codeclimate.com/github/avrabe/CarND-Unscented-Kalman-Filter-Project/badges/gpa.svg)](https://codeclimate.com/github/avrabe/CarND-Unscented-Kalman-Filter-Project)
+[![Build Status](https://travis-ci.org/avrabe/CarND-Unscented-Kalman-Filter-Project.svg?branch=master)](https://travis-ci.org/avrabe/CarND-Unscented-Kalman-Filter-Project)
 # Unscented Kalman Filter Project Starter Code
 Self-Driving Car Engineer Nanodegree Program
 
