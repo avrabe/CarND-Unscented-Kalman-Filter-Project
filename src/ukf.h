@@ -102,6 +102,9 @@ public:
    * @param meas_package The measurement at k+1
    */
   void UpdateRadar(MeasurementPackage meas_package);
+
+    VectorXd convertPolarToCartesian(const MeasurementPackage &measurement_pack) const;
+
 };
 
 #endif /* UKF_H */
