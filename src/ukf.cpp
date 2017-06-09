@@ -24,11 +24,11 @@ UKF::UKF() {
 
     // Process noise standard deviation longitudinal acceleration in m/s^2
     // TODO:  most likely change
-    std_a_ = 30;
+    std_a_ = 1;//9; //30;
 
     // Process noise standard deviation yaw acceleration in rad/s^2
     // TODO:  most likely change
-    std_yawdd_ = 30;
+    std_yawdd_ = 1;//5; //30;
 
     // Laser measurement noise standard deviation position1 in m
     std_laspx_ = 0.15;
@@ -73,6 +73,16 @@ UKF::UKF() {
 
     ///* predicted sigma points matrix
     Xsig_pred_ = MatrixXd(n_x_, 2 * n_aug_ + 1);
+
+    H_laser_ = MatrixXd(2, 5);
+    R_laser_ = MatrixXd(2, 2);
+
+    //* Set the process and measurement noises
+    H_laser_ << 1, 0, 0, 0, 0,
+            0, 1, 0, 0, 0;
+    //measurement covariance matrix - laser
+    R_laser_ << 0.0225, 0,
+            0, 0.0225;
 
 }
 
@@ -254,12 +264,8 @@ void UKF::Prediction(double delta_t) {
         VectorXd x_diff = Xsig_pred_.col(i) - x_;
         double_t foo = 2. * M_PI;
         //angle normalization
-        cout << x_diff(3) << endl;
         while (x_diff(3) > M_PI) x_diff(3) = x_diff(3) - foo;
-        cout << "#" << x_diff(3) << endl;
         while (x_diff(3) < -M_PI) x_diff(3) += foo;
-        cout << "##" << x_diff(3) << endl;
-
         P_ = P_ + weights_(i) * x_diff * x_diff.transpose();
     }
 
@@ -279,22 +285,12 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
     You'll also need to calculate the lidar NIS.
     */
     // measurement matrix
-    MatrixXd H_ = MatrixXd(2, 5);
-    MatrixXd R_ = MatrixXd(2, 2);
-    /**
-  * Set the process and measurement noises
-*/
-    H_ << 1, 0, 0, 0, 0,
-            0, 1, 0, 0, 0;
-    //measurement covariance matrix - laser
-    R_ << 0.0225, 0,
-            0, 0.0225;
 
     VectorXd z = meas_package.raw_measurements_;
-    VectorXd z_pred = H_ * x_;
+    VectorXd z_pred = H_laser_ * x_;
     VectorXd y = z - z_pred;
-    MatrixXd Ht = H_.transpose();
-    MatrixXd S = H_ * P_ * Ht + R_;
+    MatrixXd Ht = H_laser_.transpose();
+    MatrixXd S = H_laser_ * P_ * Ht + R_laser_;
     MatrixXd Si = S.inverse();
     MatrixXd PHt = P_ * Ht;
     MatrixXd K = PHt * Si;
@@ -303,7 +299,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
     x_ = x_ + (K * y);
     long x_size = x_.size();
     MatrixXd I = MatrixXd::Identity(x_size, x_size);
-    P_ = (I - K * H_) * P_;
+    P_ = (I - K * H_laser_) * P_;
 }
 
 /**
