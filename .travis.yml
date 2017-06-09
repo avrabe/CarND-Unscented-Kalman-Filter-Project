@@ -15,6 +15,7 @@ before_install:
       - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
       - sudo add-apt-repository ppa:george-edison55/precise-backports -y
       - sudo apt-get -qq update
+      - sudo apt-get install -y cmake cmake-data gcc-6 g++-6
       - sudo sh -c "(cd $TRAVIS_BUILD_DIR && sh ./install-ubuntu.sh )"
 addons:
   coverity_scan:
