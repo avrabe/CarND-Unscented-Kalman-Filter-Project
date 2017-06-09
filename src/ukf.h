@@ -107,6 +107,7 @@ public:
 
     VectorXd convertPolarToCartesian(const MeasurementPackage &measurement_pack) const;
 
+    void getAngleNormalization(VectorXd &x_diff, uint8_t number) const;
 };
 
 #endif /* UKF_H */
