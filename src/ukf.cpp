@@ -24,7 +24,7 @@ UKF::UKF() {
 
     // Process noise standard deviation longitudinal acceleration in m/s^2
     // TODO:  most likely change
-    std_a_ = 1;//9; //30;
+    std_a_ = 7;//9; //30;
 
     // Process noise standard deviation yaw acceleration in rad/s^2
     // TODO:  most likely change
@@ -81,8 +81,8 @@ UKF::UKF() {
     H_laser_ << 1, 0, 0, 0, 0,
             0, 1, 0, 0, 0;
     //measurement covariance matrix - laser
-    R_laser_ << 0.0225, 0,
-            0, 0.0225;
+    R_laser_ << 0.0725, 0,
+            0, 0.0725;
 
 }
 
