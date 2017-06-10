@@ -16,7 +16,8 @@ before_install:
       - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
       - sudo add-apt-repository ppa:george-edison55/cmake-3.x -y
       - sudo apt-get -qq update
-      - sudo apt-get install -y cmake cmake-data build-essential libssl-dev
+      - sudo apt-get install -y cmake cmake-data build-essential libssl-dev gcc-6 g++-6
+      - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6    
       - sudo sh -c "(cd $TRAVIS_BUILD_DIR && git clone https://github.com/libuv/libuv.git && cd libuv && git checkout v1.12.0 && sh autogen.sh && ./configure && make && make install && cd .. && rm -rf libuv)"
       - sudo sh -c "(cd $TRAVIS_BUILD_DIR && sh ./install-ubuntu.sh )"
 addons:
