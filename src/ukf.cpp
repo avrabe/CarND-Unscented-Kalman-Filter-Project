@@ -28,7 +28,7 @@ UKF::UKF() {
 
     // Process noise standard deviation yaw acceleration in rad/s^2
     // TODO:  most likely change
-    std_yawdd_ = 1;//5; //30;
+    std_yawdd_ = 0.5;//5; //30;
 
     // Laser measurement noise standard deviation position1 in m
     std_laspx_ = 0.15;
@@ -37,13 +37,13 @@ UKF::UKF() {
     std_laspy_ = 0.15;
 
     // Radar measurement noise standard deviation radius in m
-    std_radr_ = 0.3;
+    std_radr_ = 0.4;
 
     // Radar measurement noise standard deviation angle in rad
-    std_radphi_ = 0.03;
+    std_radphi_ = 0.04;
 
     // Radar measurement noise standard deviation radius change in m/s
-    std_radrd_ = 0.3;
+    std_radrd_ = 0.6;
 
     /**
     TODO:
@@ -67,7 +67,6 @@ UKF::UKF() {
 
     ///* Sigma point spreading parameter
     lambda_ = 3 - n_aug_;
-
     ///* Weights of sigma points
     weights_ = VectorXd(2 * n_aug_ + 1);
 
@@ -81,8 +80,8 @@ UKF::UKF() {
     H_laser_ << 1, 0, 0, 0, 0,
             0, 1, 0, 0, 0;
     //measurement covariance matrix - laser
-    R_laser_ << 0.0725, 0,
-            0, 0.0725;
+    R_laser_ << 0.0225, 0,
+            0, 0.0225;
 
 }
 
@@ -100,12 +99,14 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
     measurements.
     */
     if (not is_initialized_) {
-        if (meas_package.sensor_type_ == meas_package.LASER) {
+        if (meas_package.sensor_type_ == meas_package.LASER && use_laser_) {
             double px = meas_package.raw_measurements_[0];
             double py = meas_package.raw_measurements_[1];
             x_ << px, py, 0.1, 0.1, 0.1;
-        } else {
+            is_initialized_ = true;
+        } else if (meas_package.sensor_type_ == meas_package.RADAR && use_radar_) {
             x_ = convertPolarToCartesian(meas_package);
+            is_initialized_ = true;
         }
         P_ << 1.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 1.0, 0.0, 0.0, 0.0,
@@ -113,13 +114,12 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
                 0.0, 0.0, 0.0, 1.0, 0.0,
                 0.0, 0.0, 0.0, 0.0, 1.0;
 
-        is_initialized_ = true;
     } else {
         double delta_t = (meas_package.timestamp_ - time_us_) / 1000000.0;
         Prediction(delta_t);
-        if (meas_package.sensor_type_ == meas_package.LASER) {
+        if (meas_package.sensor_type_ == meas_package.LASER && use_laser_) {
             UpdateLidar(meas_package);
-        } else {
+        } else if (meas_package.sensor_type_ == meas_package.RADAR && use_radar_) {
             UpdateRadar(meas_package);
         }
     }
