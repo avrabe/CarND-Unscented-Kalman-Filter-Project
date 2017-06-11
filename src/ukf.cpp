@@ -83,6 +83,7 @@ UKF::UKF() {
     R_laser_ << 0.0225, 0,
             0, 0.0225;
 
+    weight_0 = lambda_ / (lambda_ + n_aug_);
 }
 
 UKF::~UKF() {}
@@ -123,11 +124,11 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 }
 
 VectorXd UKF::convertPolarToCartesian(const MeasurementPackage &measurement_pack) const {
-    double_t rho = measurement_pack.raw_measurements_[0];
-    double_t phi = measurement_pack.raw_measurements_[1];
-    double_t px = rho * cos(phi);
-    double_t py = rho * sin(phi);
-    double_t tmp = 0.0;
+    const double_t rho = measurement_pack.raw_measurements_[0];
+    const double_t phi = measurement_pack.raw_measurements_[1];
+    const double_t px = rho * cos(phi);
+    const double_t py = rho * sin(phi);
+    const double_t tmp = 0.0;
     VectorXd x_ = VectorXd(5);
     x_ << px, py, tmp, tmp, tmp;
     return x_;
@@ -196,13 +197,13 @@ void UKF::Prediction(double delta_t) {
 
     for (int i = 0; i < 2 * n_aug_ + 1; i++) {
         //extract values for better readability
-        double p_x = Xsig_aug(0, i);
-        double p_y = Xsig_aug(1, i);
-        double v = Xsig_aug(2, i);
-        double yaw = Xsig_aug(3, i);
-        double yawd = Xsig_aug(4, i);
-        double nu_a = Xsig_aug(5, i);
-        double nu_yawdd = Xsig_aug(6, i);
+        const double p_x = Xsig_aug(0, i);
+        const double p_y = Xsig_aug(1, i);
+        const double v = Xsig_aug(2, i);
+        const double yaw = Xsig_aug(3, i);
+        const double yawd = Xsig_aug(4, i);
+        const double nu_a = Xsig_aug(5, i);
+        const double nu_yawdd = Xsig_aug(6, i);
 
         //predicted state values
         double px_p, py_p;
@@ -237,7 +238,6 @@ void UKF::Prediction(double delta_t) {
     }
 
     // set weights
-    double weight_0 = lambda_ / (lambda_ + n_aug_);
     weights_(0) = weight_0;
     for (int i = 1; i < 2 * n_aug_ + 1; i++) {  //2n+1 weights
         double weight = 0.5 / (n_aug_ + lambda_);
@@ -315,7 +315,7 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
     You'll also need to calculate the radar NIS.
     */
     //set measurement dimension, radar can measure r, phi, and r_dot
-    int n_z = 3;
+    const int n_z = 3;
     //create matrix for sigma points in measurement space
     MatrixXd Zsig = MatrixXd(n_z, 2 * n_aug_ + 1);
 
