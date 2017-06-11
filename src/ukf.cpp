@@ -24,7 +24,7 @@ UKF::UKF() {
 
     // Process noise standard deviation longitudinal acceleration in m/s^2
     // TODO:  most likely change
-    std_a_ = 7;//9; //30;
+    std_a_ = 3;//9; //30;
 
     // Process noise standard deviation yaw acceleration in rad/s^2
     // TODO:  most likely change
@@ -37,13 +37,13 @@ UKF::UKF() {
     std_laspy_ = 0.15;
 
     // Radar measurement noise standard deviation radius in m
-    std_radr_ = 0.4;
+    std_radr_ = 0.3;
 
     // Radar measurement noise standard deviation angle in rad
-    std_radphi_ = 0.04;
+    std_radphi_ = 0.03;
 
     // Radar measurement noise standard deviation radius change in m/s
-    std_radrd_ = 0.6;
+    std_radrd_ = 0.3;
 
     /**
     TODO:
@@ -102,17 +102,13 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
         if (meas_package.sensor_type_ == meas_package.LASER && use_laser_) {
             double px = meas_package.raw_measurements_[0];
             double py = meas_package.raw_measurements_[1];
-            x_ << px, py, 0.1, 0.1, 0.1;
+            x_ << px, py, 0.0, 0.0, 0.0;
             is_initialized_ = true;
         } else if (meas_package.sensor_type_ == meas_package.RADAR && use_radar_) {
             x_ = convertPolarToCartesian(meas_package);
             is_initialized_ = true;
         }
-        P_ << 1.0, 0.0, 0.0, 0.0, 0.0,
-                0.0, 1.0, 0.0, 0.0, 0.0,
-                0.0, 0.0, 1.0, 0.0, 0.0,
-                0.0, 0.0, 0.0, 1.0, 0.0,
-                0.0, 0.0, 0.0, 0.0, 1.0;
+        P_ = MatrixXd::Identity(5, 5);
 
     } else {
         double delta_t = (meas_package.timestamp_ - time_us_) / 1000000.0;
@@ -131,7 +127,7 @@ VectorXd UKF::convertPolarToCartesian(const MeasurementPackage &measurement_pack
     double_t phi = measurement_pack.raw_measurements_[1];
     double_t px = rho * cos(phi);
     double_t py = rho * sin(phi);
-    double_t tmp = 0.1;
+    double_t tmp = 0.0;
     VectorXd x_ = VectorXd(5);
     x_ << px, py, tmp, tmp, tmp;
     return x_;
